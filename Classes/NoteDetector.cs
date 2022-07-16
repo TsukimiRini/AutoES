@@ -15,8 +15,8 @@ namespace AuToES.Classes
 	internal class NoteDetector
 	{
 
-		private static double superBottomSimi = 0.4;
-		private static String superTemplatePath = @"D:\Projects\AuToES\AuToES\templates\super.png";
+		private static double superBottomSimi = 0.5;
+		private static String superTemplatePath = @"..\..\..\templates\super.png";
 		private static Image<Bgr, byte> superTemplate = new Image<Bgr, byte>(superTemplatePath);
 		private static Mat superGrayTemplate = new Mat();
 
@@ -44,12 +44,12 @@ namespace AuToES.Classes
 			}
 		}
 
-		public static NoteType[] noteTypes = {new NoteType("click", 0, 110, 145, 200, 250, 255, 0.1),
-			new NoteType("lastEnd", 230, 245, 175, 195, 120, 150, 0.008),
-			new NoteType("lastStart", 230, 255, 170, 210, 0, 80, 0.1),
-			new NoteType("leftMove", 220, 250, 0, 90, 90, 150, 0.2),
-			new NoteType("rightMove", 235, 255, 68, 140, 0, 90, 0.2),
-			new NoteType("skill", 0, 100, 190, 235, 235, 255, 0.1),};
+		public static NoteType[] noteTypes = {new NoteType("click", 0, 110, 145, 200, 250, 255, 0.17),
+			new NoteType("lastEnd", 230, 245, 175, 195, 120, 150, 0.017),
+			new NoteType("lastStart", 230, 255, 170, 210, 0, 80, 0.15),
+			new NoteType("leftMove", 220, 250, 0, 90, 90, 150, 0.08),
+			new NoteType("rightMove", 235, 255, 68, 140, 0, 90, 0.08),
+			new NoteType("skill", 0, 100, 190, 235, 235, 255, 0.08),};
 
 		private static Dictionary<String, NoteType> noteMap = new Dictionary<string, NoteType>{ { "click", noteTypes[0] },
 			{ "lastEnd", noteTypes[1] },{ "lastStart", noteTypes[2] },{ "leftMove", noteTypes[3] },{ "rightMove", noteTypes[4] },{ "skill", noteTypes[5] }, };
@@ -74,7 +74,7 @@ namespace AuToES.Classes
 			MinMaxLoc(res, ref minLoc, ref maxLoc, ref minPoint, ref maxPoint);
 			var imageToPreview = image.Clone();
 			Rectangle(imageToPreview, new Rectangle(maxPoint, template.Size), new MCvScalar(0, 0, 255), 2);
-			imageToPreview.Save(@"D:\Projects\AuToES\AuToES\outputs\preview.png");
+			imageToPreview.Save(@"..\..\..\outputs\preview.png");
 
 			return matchTime;
 		}
@@ -154,7 +154,7 @@ namespace AuToES.Classes
 			watch.Stop();
 			/*Console.WriteLine(watch.ElapsedMilliseconds);*/
 
-			outputImage.Save(@"D:\Projects\AuToES\AuToES\outputs\colorPreview.png");
+			outputImage.Save(@"..\..\..\outputs\colorPreview.png");
 			return (double)cnt / (width * height);
 		}
 
@@ -198,12 +198,52 @@ namespace AuToES.Classes
 			return (double)cnt / (width * height);
 		}
 
+		public static Dictionary<string, double> imageContainNoteAll(Image<Bgr, byte> image)
+		{
+			int width = image.Width, height = image.Height;
+
+			Dictionary<string, int> cnt = new Dictionary<string, int>();
+			foreach (KeyValuePair<string, NoteType> pair in noteMap)
+			{
+				cnt.Add(pair.Key, 0);
+			}
+				var outputImage = new Image<Bgr, byte>(width, height);
+
+			for (int i = 0; i < height; i++)
+				for (int j = 0; j < width; j++)
+				{
+					foreach (KeyValuePair<string, NoteType> pair in noteMap)
+					{
+						NoteType noteTypeInfo = pair.Value;
+						string noteType = pair.Key;
+						Byte b = image.Data[i, j, 0];
+						Byte g = image.Data[i, j, 1];
+						Byte r = image.Data[i, j, 2];
+						if (r <= noteTypeInfo.rRangeTop && r >= noteTypeInfo.rRangeBottom && g <= noteTypeInfo.gRangeTop &&
+							g >= noteTypeInfo.gRangeBottom && b <= noteTypeInfo.bRangeTop && b >= noteTypeInfo.bRangeBottom)
+						{
+							cnt[noteType]++;
+						}
+					}
+
+				}
+			/*Console.WriteLine(watch.ElapsedMilliseconds);*/
+
+			/*outputImage.Save(@"D:\Projects\AuToES\AuToES\outputs\colorPreview.png");*/
+			Dictionary<string, double> res = new Dictionary<string, double>();
+			foreach(KeyValuePair<string, int> pxl in cnt)
+			{
+				res[pxl.Key] = (double)pxl.Value / (width * height);
+			}
+			return res;
+		}
+
 		public static String detectNote(String imagePath)
 		{
 			Image<Bgr, byte> image = new Image<Bgr, byte>(imagePath);
 			return detectNote(image);
 		}
-		public static String detectNote(Image<Bgr, byte> image)
+		public static String detectNote(Image<Bgr, byte> image, Boolean checkSuper=false)
 		{
 			Stopwatch watch;
 			watch = Stopwatch.StartNew();
@@ -213,13 +253,10 @@ namespace AuToES.Classes
 				watch.Stop();
 				return "super";
 			}
+
 			foreach (KeyValuePair<string, NoteType> pair in noteMap)
 			{
 				double coverage = imageContainNoteCoverage(image, pair.Key);
-/*				if(coverage > 0.15 || pair.Key=="lastEnd" && coverage>0)
-				{
-					Console.WriteLine("{0} detected, cover {1}", pair.Key, coverage);
-				}*/
 				if (coverage > pair.Value.coverage)
 				{
 					watch.Stop();
