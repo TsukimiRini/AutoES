@@ -25,14 +25,13 @@ namespace AuToES.Classes
 		private static bool targetDetected = false;
 
 		private static Image<Bgr, byte> temp = new Image<Bgr, byte>(@"..\..\..\templates\target.png");
-		private static Mat grayTemp = new Mat();
 
 		private static IntPtr win;
 		private static PSIZE emulatorSize;
 
 		static MainProcess()
 		{
-			CvtColor(temp.Mat, grayTemp, ColorConversion.Bgr2Gray);
+			ToBinary(temp.Bitmap);
 		}
 
 		internal static void main(Form mainForm)
@@ -59,6 +58,8 @@ namespace AuToES.Classes
 				}
 				Thread.Sleep(waitTime);
 			}
+
+			/*AdbHandler.press(500, 500);*/
 		}
 
 		static int cnt = 0;
@@ -76,31 +77,38 @@ namespace AuToES.Classes
 			}
 		}
 
-		private static double targetBottomSimi = 0.2;
 		private static int targetCropSize = 100;
+		private static int targetBottomHashSimi = 150;
+		private static int targetBottomHashWhiteSimi = 25;
 		internal static void checkTarget()
 		{
 			while (true)
 			{
-				Thread.Sleep(1500);
+				Thread.Sleep(1000);
 				// TODO: 优化，最好不要在子线程中重复截屏
 				Bitmap captured = WindowHandler.CaptureWindow(win, 0, 0, emulatorSize.x, emulatorSize.y);
-				/*}*/
+				int cnt = 0;
 				for (int i = 0; i < targets.Length; i++)
 				{
 					var target = targets[i];
 					Bitmap targetCrop = Utils.cropBMP(captured, target.X - bias.X - targetCropSize / 2, target.Y - bias.Y - targetCropSize / 2, targetCropSize, targetCropSize);
-					/*Utils.saveBMP(targetCrop, @"D:\Projects\AuToES\AuToES\outputs\target" + cnt++ + ".png");*/
-					double simi = NoteDetector.Compare(new Image<Bgr, byte>(targetCrop), temp, grayTemp);
-					if (simi > targetBottomSimi)
-					{
-						if (!targetDetected)
-						{
-							targetDetected = true;
-							Console.WriteLine("target detected");
-						}
+					ToBinary(targetCrop);
 
-						break;
+					int hashSimi, hashWhiteSimi;
+					(hashSimi, hashWhiteSimi) = NoteDetector.HashGetEquals(targetCrop, temp.Bitmap);
+					if (hashSimi > targetBottomHashSimi && hashWhiteSimi > targetBottomHashWhiteSimi)
+					{
+						cnt++;
+
+						if (cnt >= 2)
+						{
+							if (targetDetected == false)
+							{
+								targetDetected = true;
+								Console.WriteLine("target detected");
+							}
+							break;
+						}
 					}
 					if (targetDetected && i == targets.Length - 1)
 					{
@@ -109,6 +117,19 @@ namespace AuToES.Classes
 					}
 				}
 			}
+		}
+
+		private static void ToBinary(Bitmap Bmp)
+		{
+			int rgb;
+			Color c;
+
+			for (int y = 0; y < Bmp.Height; y++)
+				for (int x = 0; x < Bmp.Width; x++)
+				{
+					c = Bmp.GetPixel(x, y);
+					if (c.R != 255 || c.G != 255 || c.B != 255) Bmp.SetPixel(x, y, Color.FromArgb(0, 0, 0));
+				}
 		}
 
 		private static void reactToNote(IntPtr hwnd, Image<Bgr, Byte> cropImage, Point target, Boolean checkSuper)
@@ -120,12 +141,14 @@ namespace AuToES.Classes
 				case "lastStart":
 					if (clicked && countDown != countDownMax) break;
 					TouchEmulator.ClickOn(hwnd, target);
+					/*AdbHandler.press(target.X, target.Y);*/
 					clicked = true;
 					countDown = countDownMax;
 					break;
 				case "lastEnd":
 				case "super":
 					TouchEmulator.ClickOn(hwnd, target);
+					/*AdbHandler.press(target.X, target.Y);*/
 					clicked = true;
 					countDown = countDownMax;
 					break;

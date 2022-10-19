@@ -58,7 +58,7 @@ namespace AuToES
 
 			TouchEmulator.MoveToLeft(win, new Point(220, 200));*/
 
-			/*long matchTime = TemplateMatch.FindMatch(@"C:\Users\10275\Pictures\Screenshots\фад╩╫ьм╪(24).png", @"D:\Projects\AutoEsSprites\clickBig.png");*/
+			/*long matchTime = TemplateMatch.FindMatch(@"C:\Users\10275\Pictures\Screenshots\О©╫О©╫д╩О©╫О©╫м╪(24).png", @"D:\Projects\AutoEsSprites\clickBig.png");*/
 			/*double dist = NoteDetector.Compare(@"D:\Projects\AutoESTest\Snipaste_2022-06-29_10-28-02.png", @"D:\Projects\AutoEsSprites\leftMoveBig.png");
 			this.Text = dist.ToString();*/
 			/*double cnt = NoteDetector.imageContainNoteCoverage(@"D:\Projects\AutoEsSprites\skill.png", "click");

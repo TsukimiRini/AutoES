@@ -9,6 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="sharpadbclient" Version="2.3.23" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="Emgu.CV.UI">
       <HintPath>..\..\..\Environment\libemgucv-windesktop-3.1.0.2282\bin\Emgu.CV.UI.dll</HintPath>
     </Reference>

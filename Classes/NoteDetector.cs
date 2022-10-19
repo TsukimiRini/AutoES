@@ -44,8 +44,8 @@ namespace AuToES.Classes
 			}
 		}
 
-		public static NoteType[] noteTypes = {new NoteType("click", 0, 110, 145, 200, 250, 255, 0.17),
-			new NoteType("lastEnd", 230, 245, 175, 195, 120, 150, 0.017),
+		public static NoteType[] noteTypes = {new NoteType("click", 0, 110, 145, 200, 250, 255, 0.15),
+			new NoteType("lastEnd", 230, 245, 175, 195, 120, 150, 0.01),
 			new NoteType("lastStart", 230, 255, 170, 210, 0, 80, 0.15),
 			new NoteType("leftMove", 220, 250, 0, 90, 90, 150, 0.08),
 			new NoteType("rightMove", 235, 255, 68, 140, 0, 90, 0.08),
@@ -77,6 +77,32 @@ namespace AuToES.Classes
 			imageToPreview.Save(@"..\..\..\outputs\preview.png");
 
 			return matchTime;
+		}
+
+		public static List<bool> GetBMPHash16(Bitmap bmpSource)
+		{
+			List<bool> lResult = new List<bool>();
+			//create new image with 16x16 pixel
+			Bitmap bmpMin = new Bitmap(bmpSource, new Size(16, 16));
+			for (int j = 0; j < bmpMin.Height; j++)
+			{
+				for (int i = 0; i < bmpMin.Width; i++)
+				{
+					//reduce colors to true / false                
+					lResult.Add(bmpMin.GetPixel(i, j).GetBrightness() < 0.5f);
+				}
+			}
+			return lResult;
+		}
+
+		public static (int, int) HashGetEquals(Bitmap a, Bitmap b)
+		{
+			List<bool> iHash1 = GetBMPHash16(a);
+			List<bool> iHash2 = GetBMPHash16(b);
+			int equalElements = iHash1.Zip(iHash2, (i, j) => i == j).Count(eq => eq);
+			int equalWhiteElements = iHash1.Zip(iHash2, (i, j) => (i==false) && (i == j)).Count(eq => eq);
+
+			return (equalElements, equalWhiteElements);
 		}
 
 		public static double Compare(Image<Bgr, byte> image, Image<Bgr, byte> template, Mat temGray)
