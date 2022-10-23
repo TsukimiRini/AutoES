@@ -154,11 +154,9 @@ namespace AuToES.Classes
 					break;
 				case "leftMove":
 					TouchEmulator.MoveToLeft(hwnd, target);
-					Console.WriteLine("left");
 					break;
 				case "rightMove":
 					TouchEmulator.MoveToRight(hwnd, target);
-					Console.WriteLine("right");
 					break;
 			}
 		}

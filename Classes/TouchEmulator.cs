@@ -38,7 +38,19 @@ namespace AuToES.Classes
 			var inputMouseMoveLeft = MouseMoveLeftInput();
 			var inputMouseUp = MouseUpInput();
 			Win32.SetForegroundWindow(hwnd);
-			SendOutInputs(inputMouseDown, inputMouseMoveLeft, inputMouseUp);
+			SendOutInputs(inputMouseDown);
+			Thread.Sleep(10);
+			SendOutInputs(inputMouseMoveLeft);
+			Thread.Sleep(10);
+			SendOutInputs(inputMouseMoveLeft);
+			Thread.Sleep(10);
+			SendOutInputs(inputMouseMoveLeft);
+			Thread.Sleep(10);
+			SendOutInputs(inputMouseMoveLeft);
+			Thread.Sleep(10);
+			SendOutInputs(inputMouseMoveLeft);
+			Thread.Sleep(10);
+			SendOutInputs(inputMouseUp);
 
 			Cursor.Position = oldPos;
 			/*Win32.SetForegroundWindow(oldFgWin);*/
@@ -56,7 +68,19 @@ namespace AuToES.Classes
 			var inputMouseMoveLeft = MouseMoveRightInput();
 			var inputMouseUp = MouseUpInput();
 			Win32.SetForegroundWindow(hwnd);
-			SendOutInputs(inputMouseDown, inputMouseMoveLeft, inputMouseUp);
+			SendOutInputs(inputMouseDown);
+			Thread.Sleep(10);
+			SendOutInputs(inputMouseMoveLeft);
+			Thread.Sleep(10);
+			SendOutInputs(inputMouseMoveLeft);
+			Thread.Sleep(10);
+			SendOutInputs(inputMouseMoveLeft);
+			Thread.Sleep(10);
+			SendOutInputs(inputMouseMoveLeft);
+			Thread.Sleep(10);
+			SendOutInputs(inputMouseMoveLeft);
+			Thread.Sleep(10);
+			SendOutInputs(inputMouseUp);
 
 			Cursor.Position = oldPos;
 			/*Win32.SetForegroundWindow(oldFgWin);*/
@@ -74,10 +98,21 @@ namespace AuToES.Classes
 			var inputMouseMoveLeft = MouseMoveUpInput();
 			var inputMouseUp = MouseUpInput();
 			Win32.SetForegroundWindow(hwnd);
-			SendOutInputs(inputMouseDown, inputMouseMoveLeft, inputMouseUp);
+			SendOutInputs(inputMouseDown);
+			Thread.Sleep(10);
+			SendOutInputs(inputMouseMoveLeft);
+			Thread.Sleep(10);
+			SendOutInputs(inputMouseMoveLeft);
+			Thread.Sleep(10);
+			SendOutInputs(inputMouseMoveLeft);
+			Thread.Sleep(10);
+			SendOutInputs(inputMouseMoveLeft);
+			Thread.Sleep(10);
+			SendOutInputs(inputMouseMoveLeft);
+			Thread.Sleep(10);
+			SendOutInputs(inputMouseUp);
 
 			Cursor.Position = oldPos;
-			/*Win32.SetForegroundWindow(oldFgWin);*/
 		}
 
 		public static void MoveToDown(IntPtr hwnd, Point clientPoint)
@@ -92,7 +127,19 @@ namespace AuToES.Classes
 			var inputMouseMoveLeft = MouseMoveDownInput();
 			var inputMouseUp = MouseUpInput();
 			Win32.SetForegroundWindow(hwnd);
-			SendOutInputs(inputMouseDown, inputMouseMoveLeft, inputMouseUp);
+			SendOutInputs(inputMouseDown);
+			Thread.Sleep(10);
+			SendOutInputs(inputMouseMoveLeft);
+			Thread.Sleep(10);
+			SendOutInputs(inputMouseMoveLeft);
+			Thread.Sleep(10);
+			SendOutInputs(inputMouseMoveLeft);
+			Thread.Sleep(10);
+			SendOutInputs(inputMouseMoveLeft);
+			Thread.Sleep(10);
+			SendOutInputs(inputMouseMoveLeft);
+			Thread.Sleep(10);
+			SendOutInputs(inputMouseUp);
 
 			Cursor.Position = oldPos;
 			/*Win32.SetForegroundWindow(oldFgWin);*/
@@ -150,43 +197,39 @@ namespace AuToES.Classes
 			return inputMouseDown;
 		}
 
-		private static INPUT MouseMoveLeftInput(uint time = 400, int x =20)
+		private static INPUT MouseMoveLeftInput(int x = 10)
 		{
 			var inputMouseDown = new INPUT();
 			inputMouseDown.Type = 0;
 			inputMouseDown.Data.Mouse.Flags = 0x0001;
 			inputMouseDown.Data.Mouse.X = -x;
-			inputMouseDown.Data.Mouse.Time = time;
 			return inputMouseDown;
 		}
 
-		private static INPUT MouseMoveRightInput(uint time = 400, int x = 20)
+		private static INPUT MouseMoveRightInput(int x = 10)
 		{
 			var inputMouseDown = new INPUT();
 			inputMouseDown.Type = 0;
 			inputMouseDown.Data.Mouse.Flags = 0x0001;
 			inputMouseDown.Data.Mouse.X = x;
-			inputMouseDown.Data.Mouse.Time = time;
 			return inputMouseDown;
 		}
 
-		private static INPUT MouseMoveUpInput(uint time = 400, int x = 20)
+		private static INPUT MouseMoveUpInput(int x = 10)
 		{
 			var inputMouseDown = new INPUT();
 			inputMouseDown.Type = 0;
 			inputMouseDown.Data.Mouse.Flags = 0x0001;
 			inputMouseDown.Data.Mouse.Y = -x;
-			inputMouseDown.Data.Mouse.Time = time;
 			return inputMouseDown;
 		}
 
-		private static INPUT MouseMoveDownInput(uint time = 400, int x = 20)
+		private static INPUT MouseMoveDownInput(int x = 10)
 		{
 			var inputMouseDown = new INPUT();
 			inputMouseDown.Type = 0;
 			inputMouseDown.Data.Mouse.Flags = 0x0001;
 			inputMouseDown.Data.Mouse.Y = x;
-			inputMouseDown.Data.Mouse.Time = time;
 			return inputMouseDown;
 		}
 
