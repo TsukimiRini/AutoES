@@ -47,8 +47,8 @@ namespace AuToES.Classes
 		public static NoteType[] noteTypes = {new NoteType("click", 0, 110, 145, 200, 250, 255, 0.15),
 			new NoteType("lastEnd", 230, 245, 175, 195, 120, 150, 0.01),
 			new NoteType("lastStart", 230, 255, 170, 210, 0, 80, 0.15),
-			new NoteType("leftMove", 220, 250, 0, 90, 90, 150, 0.05),
-			new NoteType("rightMove", 235, 255, 68, 140, 0, 90, 0.05),
+			new NoteType("leftMove", 220, 250, 0, 90, 90, 150, 0.08),
+			new NoteType("rightMove", 235, 255, 68, 140, 0, 90, 0.08),
 			new NoteType("skill", 0, 100, 190, 235, 235, 255, 0.08),};
 
 		private static Dictionary<String, NoteType> noteMap = new Dictionary<string, NoteType>{ { "click", noteTypes[0] },

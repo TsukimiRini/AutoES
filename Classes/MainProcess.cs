@@ -13,13 +13,15 @@ namespace AuToES.Classes
 {
 	internal class MainProcess
 	{
-		private static Point bias = new Point(156, 33);
-		private static Point[] targets = {new Point(1216, 849), new Point (468, 711), new Point(696, 848), new Point(956,896),
-		new Point(1444, 713), new Point(1609, 503), new Point(305, 502)};
+		private static Point[] targets;
+		private static Point[] targetsSeven = {new Point(1060, 816), new Point (312, 678), new Point(540, 815), new Point(799,863),
+		new Point(1288, 680), new Point(1453, 470), new Point(149, 469)};
+		private static Point[] targetsNine = {new Point(799,860), new Point(264, 628), new Point(419, 754), new Point(602, 832),
+		new Point(996, 834), new Point(1178, 756), new Point(1334, 633), new Point(1451, 471), new Point(148, 469)};
 		private static int cropSize = 160;
 
-		private static bool clicked = false;
-		private static int countDown = 0;
+		private static bool[] clicked = new bool[9];
+		private static int[] countDown = new int[9];
 		private static int countDownMax = 3;
 		private static int waitTime = 1000;
 		private static bool targetDetected = false;
@@ -36,6 +38,12 @@ namespace AuToES.Classes
 
 		internal static void main(Form mainForm)
 		{
+			targets = targetsNine;
+			for (int i = 0; i < targets.Length; i++)
+			{
+				clicked[i] = false;
+				countDown[i] = 0;
+			}
 			var process = Process.GetProcessesByName("dnplayer")[0];
 			win = process.MainWindowHandle;
 			IntPtr thumbnailPtr;
@@ -51,9 +59,13 @@ namespace AuToES.Classes
 			{
 				while (targetDetected)
 				{
-					if (countDown == 1)
-						clicked = false;
-					countDown--;
+					for (int i = 0; i < targets.Length; i++)
+					{
+						if (countDown[i] == 1)
+							clicked[i] = false;
+						else
+							countDown[i]--;
+					}
 					oneLoop(win, thumbnailPtr);
 				}
 				Thread.Sleep(waitTime);
@@ -72,8 +84,8 @@ namespace AuToES.Classes
 			for (int i = 0; i < targets.Length; i++)
 			{
 				var target = targets[i];
-				Bitmap targetCrop = Utils.cropBMP(captured, target.X - bias.X - cropSize / 2, target.Y - bias.Y - cropSize / 2, cropSize, cropSize);
-				reactToNote(emulatorHandle, new Image<Bgr, byte>(targetCrop), new Point(target.X - bias.X, target.Y - bias.Y), i == 0);
+				Bitmap targetCrop = Utils.cropBMP(captured, target.X - cropSize / 2, target.Y - cropSize / 2, cropSize, cropSize);
+				reactToNote(emulatorHandle, new Image<Bgr, byte>(targetCrop), i, new Point(target.X, target.Y), i == 0);
 			}
 		}
 
@@ -91,7 +103,7 @@ namespace AuToES.Classes
 				for (int i = 0; i < targets.Length; i++)
 				{
 					var target = targets[i];
-					Bitmap targetCrop = Utils.cropBMP(captured, target.X - bias.X - targetCropSize / 2, target.Y - bias.Y - targetCropSize / 2, targetCropSize, targetCropSize);
+					Bitmap targetCrop = Utils.cropBMP(captured, target.X - targetCropSize / 2, target.Y - targetCropSize / 2, targetCropSize, targetCropSize);
 					ToBinary(targetCrop);
 
 					int hashSimi, hashWhiteSimi;
@@ -100,7 +112,7 @@ namespace AuToES.Classes
 					{
 						cnt++;
 
-						if (cnt >= 2)
+						if (cnt >= targets.Length / 3)
 						{
 							if (targetDetected == false)
 							{
@@ -132,25 +144,25 @@ namespace AuToES.Classes
 				}
 		}
 
-		private static void reactToNote(IntPtr hwnd, Image<Bgr, Byte> cropImage, Point target, Boolean checkSuper)
+		private static void reactToNote(IntPtr hwnd, Image<Bgr, Byte> cropImage, int targetIdx, Point target, Boolean checkSuper)
 		{
 			switch (NoteDetector.detectNote(cropImage, checkSuper))
 			{
 				case "click":
 				case "skill":
 				case "lastStart":
-					if (clicked && countDown != countDownMax) break;
+					if (clicked[targetIdx] && countDown[targetIdx] != countDownMax) break;
 					TouchEmulator.ClickOn(hwnd, target);
 					/*AdbHandler.press(target.X, target.Y);*/
-					clicked = true;
-					countDown = countDownMax;
+					clicked[targetIdx] = true;
+					countDown[targetIdx] = countDownMax;
 					break;
 				case "lastEnd":
 				case "super":
 					TouchEmulator.ClickOn(hwnd, target);
 					/*AdbHandler.press(target.X, target.Y);*/
-					clicked = true;
-					countDown = countDownMax;
+					clicked[targetIdx] = true;
+					countDown[targetIdx] = countDownMax;
 					break;
 				case "leftMove":
 					TouchEmulator.MoveToLeft(hwnd, target);
